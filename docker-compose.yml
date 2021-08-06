@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis
+    networks:
+      - default
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=es01
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - default
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - es01
+      - redis
+    networks:
+      - default
+
+
+networks:
+  default:
+volumes:
+  es_data:

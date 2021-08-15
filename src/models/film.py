@@ -4,6 +4,8 @@ from typing import Optional
 from uuid import UUID
 
 import orjson
+from models.genre import Genre
+from models.person import Person
 from pydantic import BaseModel
 from utils import orjson_dumps
 
@@ -23,6 +25,8 @@ class Film(BaseModel):
     uuid: UUID
     certificate: Optional[str] = None
     file_path: Optional[str] = None
+    genres: list[Genre]
+    people: list[Person]
 
     class Config:
         json_loads = orjson.loads

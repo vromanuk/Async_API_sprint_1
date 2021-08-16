@@ -31,6 +31,22 @@ class FilmService:
         doc = await self.elastic.get("movies", film_id)
         return Film(**doc["_source"])
 
+    async def _get_films_from_elastic(self, es_query: Optional[dict] = None) -> Optional[list[Film]]:
+        if es_query:
+            doc = await self.elastic.search(
+                index="movies",
+                body=es_query["query"],
+                sort=es_query["sort"],
+                size=es_query["limit"],
+                from_=es_query["from"],
+                _source=es_query["source"],
+            )
+        else:
+            doc = await self.elastic.search(
+                index="movies",
+            )
+        return [Film(**film["_source"]) for film in doc]
+
     async def _film_from_cache(self, film_id: str) -> Optional[Film]:
         data = await self.redis.get(film_id)
         if not data:
@@ -39,8 +55,29 @@ class FilmService:
         film = Film.parse_raw(data)
         return film
 
+    async def _films_from_cache(self) -> Optional[list[Film]]:
+        data = await self.redis.get("films")
+        if not data:
+            return None
+
+        films = [Film.parse_raw(film) for film in data]
+        return films
+
     async def _put_film_to_cache(self, film: Film):
         await self.redis.set(film.id, film.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+
+    async def _put_films_to_cache(self, films: list[Film]):
+        await self.redis.set("films", films, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+
+    async def get_films(self, es_query: Optional[dict] = None) -> Optional[list[Film]]:
+        films = await self._films_from_cache()
+        if not films:
+            films = await self._get_films_from_elastic(es_query)
+            if not films:
+                return None
+            await self._put_films_to_cache(films)
+
+        return films
 
 
 @lru_cache()

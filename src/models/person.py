@@ -7,7 +7,7 @@ from utils import orjson_dumps
 
 
 class Person(BaseModel):
-    uuid: UUID
+    id: UUID
     first_name: str
     last_name: str
     birth_date: datetime.date

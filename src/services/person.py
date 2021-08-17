@@ -26,9 +26,33 @@ class PersonService:
 
         return person
 
+    async def _get_people_from_elastic(self, es_query: Optional[dict] = None) -> Optional[list[Person]]:
+        if es_query:
+            doc = await self.elastic.search(
+                index="people",
+                body=es_query["query"],
+                sort=es_query["sort"],
+                size=es_query["limit"],
+                from_=es_query["from"],
+                _source=es_query["source"],
+            )
+        else:
+            doc = await self.elastic.search(
+                index="people",
+            )
+        return [Person(**person["_source"]) for person in doc]
+
     async def _get_person_from_elastic(self, person_id: str) -> Optional[Person]:
         doc = await self.elastic.get("people", person_id)
         return Person(**doc["_source"])
+
+    async def _people_from_cache(self) -> Optional[list[Person]]:
+        data = await self.redis.get("people")
+        if not data:
+            return None
+
+        people = [Person.parse_raw(person) for person in data]
+        return people
 
     async def _person_from_cache(self, person_id: str) -> Optional[Person]:
         data = await self.redis.get(person_id)
@@ -38,8 +62,21 @@ class PersonService:
         person = Person.parse_raw(data)
         return person
 
+    async def _put_people_to_cache(self, people: list[Person]):
+        await self.redis.set("people", people, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+
     async def _put_person_to_cache(self, person: Person):
         await self.redis.set(person.id, person.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+
+    async def get_people(self, es_query: Optional[dict] = None) -> Optional[list[Person]]:
+        people = await self._people_from_cache()
+        if not people:
+            people = await self._get_people_from_elastic(es_query)
+            if not people:
+                return None
+            await self._put_people_to_cache(people)
+
+        return people
 
 
 @lru_cache()

@@ -26,6 +26,22 @@ class GenreService:
 
         return genre
 
+    async def _get_genres_from_elastic(self, es_query: Optional[dict] = None) -> Optional[list[Genre]]:
+        if es_query:
+            doc = await self.elastic.search(
+                index="genres",
+                body=es_query["query"],
+                sort=es_query["sort"],
+                size=es_query["limit"],
+                from_=es_query["from"],
+                _source=es_query["source"],
+            )
+        else:
+            doc = await self.elastic.search(
+                index="genres",
+            )
+        return [Genre(**genre["_source"]) for genre in doc]
+
     async def _get_genre_from_elastic(self, genre_id: str) -> Optional[Genre]:
         doc = await self.elastic.get("genres", genre_id)
         return Genre(**doc["_source"])
@@ -40,6 +56,27 @@ class GenreService:
 
     async def _put_genre_to_cache(self, genre: Genre):
         await self.redis.set(genre.id, genre.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+
+    async def _put_genres_to_cache(self, genres: list[Genre]):
+        await self.redis.set("genres", genres, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+
+    async def _genres_from_cache(self) -> Optional[list[Genre]]:
+        data = await self.redis.get("genres")
+        if not data:
+            return None
+
+        genres = [Genre.parse_raw(genre) for genre in data]
+        return genres
+
+    async def get_genres(self, es_query: Optional[dict] = None) -> Optional[list[Genre]]:
+        genres = await self._genres_from_cache()
+        if not genres:
+            genres = await self._get_genres_from_elastic(es_query)
+            if not genres:
+                return None
+            await self._put_genres_to_cache(genres)
+
+        return genres
 
 
 @lru_cache()

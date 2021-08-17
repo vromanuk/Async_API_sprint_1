@@ -2,6 +2,7 @@ from enum import Enum
 from http import HTTPStatus
 from typing import Optional
 
+from constants import SortOrder
 from fastapi import APIRouter, Depends, HTTPException
 from models.film import Film
 from services.film import FilmService, get_film_service
@@ -9,11 +10,6 @@ from services.film import FilmService, get_film_service
 router = APIRouter(
     prefix="/films",
 )
-
-
-class SortOrder(str, Enum):
-    ASC = "asc"
-    DESC = "desc"
 
 
 class SortField(str, Enum):

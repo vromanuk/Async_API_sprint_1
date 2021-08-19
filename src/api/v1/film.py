@@ -49,7 +49,7 @@ async def film_list(
 
     films = await film_service.get_films(es_query)
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="there are no films")
+        return []
 
     return films
 

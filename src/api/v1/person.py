@@ -49,7 +49,7 @@ async def people_list(
 
     people = await person_service.get_people(es_query)
     if not people:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="there are no people")
+        return []
 
     return people
 

@@ -48,7 +48,7 @@ async def genre_list(
 
     genres = await genre_service.get_genres(es_query)
     if not genres:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="there are no genres")
+        return []
 
     return genres
 

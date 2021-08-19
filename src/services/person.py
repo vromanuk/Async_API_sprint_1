@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Optional
 
 from aioredis import Redis
-from constants import FILM_CACHE_EXPIRE_IN_SECONDS
+from core.config import FILM_CACHE_EXPIRE_IN_SECONDS
 from db.elastic import get_elastic
 from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch

@@ -1,6 +1,5 @@
-from dataclasses import dataclass
 from functools import lru_cache
-from typing import Optional
+from typing import List, Optional, Union
 
 from aioredis import Redis
 from core.config import FILM_CACHE_EXPIRE_IN_SECONDS
@@ -9,28 +8,25 @@ from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 from models.film import Film
+from services.base import BaseService
 
 
-@dataclass
-class FilmService:
-    redis: Redis
-    elastic: AsyncElasticsearch
-
+class FilmService(BaseService):
     async def get_by_id(self, film_id: str) -> Optional[Film]:
-        film = await self._film_from_cache(film_id)
+        film = await self.get_from_cache(f"film_{film_id}")
         if not film:
-            film = await self._get_film_from_elastic(film_id)
+            film = await self.get_from_elastic_scalar(film_id)
             if not film:
                 return None
-            await self._put_film_to_cache(film)
+            await self.cache(film)
 
         return film
 
-    async def _get_film_from_elastic(self, film_id: str) -> Optional[Film]:
+    async def get_from_elastic_scalar(self, film_id: str) -> Optional[Film]:
         doc = await self.elastic.get("movies", film_id)
         return Film(**doc["_source"])
 
-    async def _get_films_from_elastic(self, es_query: Optional[dict] = None) -> Optional[list[Film]]:
+    async def get_from_elastic_many(self, es_query: Optional[dict] = None) -> Optional[list[Film]]:
         if es_query:
             doc = await self.elastic.search(
                 index="movies",
@@ -46,15 +42,14 @@ class FilmService:
             )
         return [Film(**film["_source"]) for film in doc]
 
-    async def _film_from_cache(self, film_id: str) -> Optional[Film]:
-        data = await self.redis.get(film_id)
-        if not data:
-            return None
+    async def get_from_cache(self, film_id: Optional[str] = None) -> Optional[Union[Film, List[Film]]]:
+        if film_id:
+            data = await self.redis.get(film_id)
+            if not data:
+                return None
 
-        film = Film.parse_raw(data)
-        return film
-
-    async def _films_from_cache(self) -> Optional[list[Film]]:
+            film = Film.parse_raw(data)
+            return film
         data = await self.redis.get("films")
         if not data:
             return None
@@ -62,19 +57,19 @@ class FilmService:
         films = [Film.parse_raw(film) for film in data]
         return films
 
-    async def _put_film_to_cache(self, film: Film):
-        await self.redis.set(film.id, film.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+    async def cache(self, data: Union[Film, List[Film]]):
+        if isinstance(data, list):
+            await self.redis.set("films", data, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+        else:
+            await self.redis.set(f"film_{data.id}", data.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
-    async def _put_films_to_cache(self, films: list[Film]):
-        await self.redis.set("films", films, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
-
-    async def get_films(self, es_query: Optional[dict] = None) -> Optional[list[Film]]:
-        films = await self._films_from_cache()
+    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Film]]:
+        films = await self.get_from_cache()
         if not films:
-            films = await self._get_films_from_elastic(es_query)
+            films = await self.get_from_elastic_many(es_query)
             if not films:
                 return None
-            await self._put_films_to_cache(films)
+            await self.cache(films)
 
         return films
 

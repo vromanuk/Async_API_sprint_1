@@ -47,7 +47,7 @@ async def people_list(
             }
         }
 
-    people = await person_service.get_people(es_query)
+    people = await person_service.get_list(es_query)
     if not people:
         return []
 

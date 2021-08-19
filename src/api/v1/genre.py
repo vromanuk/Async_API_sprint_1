@@ -46,7 +46,7 @@ async def genre_list(
             }
         }
 
-    genres = await genre_service.get_genres(es_query)
+    genres = await genre_service.get_list(es_query)
     if not genres:
         return []
 

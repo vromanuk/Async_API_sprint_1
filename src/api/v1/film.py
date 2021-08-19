@@ -47,7 +47,7 @@ async def film_list(
             }
         }
 
-    films = await film_service.get_films(es_query)
+    films = await film_service.get_list(es_query)
     if not films:
         return []
 

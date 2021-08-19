@@ -22,6 +22,16 @@ class PersonService(BaseService):
 
         return person
 
+    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Person]]:
+        people = await self.get_from_cache()
+        if not people:
+            people = await self.get_from_elastic_many(es_query)
+            if not people:
+                return None
+            await self.cache(people)
+
+        return people
+
     async def get_from_elastic_many(self, es_query: Optional[dict] = None) -> Optional[list[Person]]:
         if es_query:
             doc = await self.elastic.search(
@@ -62,16 +72,6 @@ class PersonService(BaseService):
             await self.redis.set("people", data, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
         else:
             await self.redis.set(f"person_{data.id}", data.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
-
-    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Person]]:
-        people = await self.get_from_cache()
-        if not people:
-            people = await self.get_from_elastic_many(es_query)
-            if not people:
-                return None
-            await self.cache(people)
-
-        return people
 
 
 @lru_cache()

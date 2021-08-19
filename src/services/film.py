@@ -22,6 +22,16 @@ class FilmService(BaseService):
 
         return film
 
+    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Film]]:
+        films = await self.get_from_cache()
+        if not films:
+            films = await self.get_from_elastic_many(es_query)
+            if not films:
+                return None
+            await self.cache(films)
+
+        return films
+
     async def get_from_elastic_scalar(self, film_id: str) -> Optional[Film]:
         doc = await self.elastic.get("movies", film_id)
         return Film(**doc["_source"])
@@ -62,16 +72,6 @@ class FilmService(BaseService):
             await self.redis.set("films", data, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
         else:
             await self.redis.set(f"film_{data.id}", data.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
-
-    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Film]]:
-        films = await self.get_from_cache()
-        if not films:
-            films = await self.get_from_elastic_many(es_query)
-            if not films:
-                return None
-            await self.cache(films)
-
-        return films
 
 
 @lru_cache()

@@ -22,6 +22,16 @@ class GenreService(BaseService):
 
         return genre
 
+    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Genre]]:
+        genres = await self.get_from_cache()
+        if not genres:
+            genres = await self.get_from_elastic_many(es_query)
+            if not genres:
+                return None
+            await self.cache(genres)
+
+        return genres
+
     async def get_from_elastic_many(self, es_query: Optional[dict] = None) -> Optional[list[Genre]]:
         if es_query:
             doc = await self.elastic.search(
@@ -62,16 +72,6 @@ class GenreService(BaseService):
             await self.redis.set("genres", data, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
         else:
             await self.redis.set(f"genre_{data.id}", data.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
-
-    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Genre]]:
-        genres = await self.get_from_cache()
-        if not genres:
-            genres = await self.get_from_elastic_many(es_query)
-            if not genres:
-                return None
-            await self.cache(genres)
-
-        return genres
 
 
 @lru_cache()

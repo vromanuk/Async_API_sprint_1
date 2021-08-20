@@ -8,7 +8,7 @@ from models.film import Film
 from services.film import FilmService, get_film_service
 
 router = APIRouter(
-    prefix="/films/",
+    prefix="/films",
 )
 
 

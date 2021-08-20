@@ -1,6 +1,8 @@
 from api.v1 import film, genre, person
-from main import app
+from fastapi import APIRouter
 
-app.include_router(film.router, prefix="/v1", tags=["film"])
-app.include_router(genre.router, prefix="/v1", tags=["genre"])
-app.include_router(person.router, prefix="/v1", tags=["person"])
+api_router = APIRouter()
+
+api_router.include_router(film.router, tags=["film"])
+api_router.include_router(genre.router, tags=["genre"])
+api_router.include_router(person.router, tags=["person"])

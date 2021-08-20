@@ -9,6 +9,7 @@ from db import elastic, redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from routes import api_router
 
 app = FastAPI(
     title=config.PROJECT_NAME,
@@ -30,6 +31,8 @@ async def shutdown():
     await redis.redis.close()
     await elastic.es.close()
 
+
+app.include_router(api_router, prefix=config.API_V1_PREFIX)
 
 if __name__ == "__main__":
     uvicorn.run(

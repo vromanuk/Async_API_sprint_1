@@ -8,7 +8,7 @@ from models.person import Person
 from services.person import PersonService, get_person_service
 
 router = APIRouter(
-    prefix="/people/",
+    prefix="/people",
 )
 
 

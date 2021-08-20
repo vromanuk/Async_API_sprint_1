@@ -1,4 +1,5 @@
 import logging
+from logging import config as logging_config
 
 import aioredis
 import uvicorn as uvicorn
@@ -20,6 +21,7 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup():
+    logging_config.dictConfig(LOGGING)
     redis.redis = await aioredis.create_redis_pool((config.REDIS_HOST, config.REDIS_PORT), minsize=10, maxsize=20)
     elastic.es = AsyncElasticsearch(hosts=[f"{config.ELASTIC_HOST}:{config.ELASTIC_PORT}"])
 

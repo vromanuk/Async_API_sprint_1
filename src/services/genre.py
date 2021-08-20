@@ -2,7 +2,6 @@ from functools import lru_cache
 from typing import List, Optional, Union
 
 from aioredis import Redis
-from core.config import FILM_CACHE_EXPIRE_IN_SECONDS
 from db.elastic import get_elastic
 from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch
@@ -13,12 +12,13 @@ from services.base import BaseService
 
 class GenreService(BaseService):
     async def get_by_id(self, genre_id: str) -> Optional[Genre]:
-        genre = await self.get_from_cache(f"genre_{genre_id}")
+        key = f"genre_{genre_id}"
+        genre = await self.get_from_cache(key)
         if not genre:
             genre = await self.get_from_elastic_scalar(genre_id)
             if not genre:
                 return None
-            await self.cache(genre)
+            await self.cache(key, genre.json())
 
         return genre
 
@@ -28,7 +28,7 @@ class GenreService(BaseService):
             genres = await self.get_from_elastic_many(es_query)
             if not genres:
                 return None
-            await self.cache(genres)
+            await self.cache("genres", genres)
 
         return genres
 
@@ -66,12 +66,6 @@ class GenreService(BaseService):
 
         genres = [Genre.parse_raw(genre) for genre in data]
         return genres
-
-    async def cache(self, data: Union[Genre, List[Genre]]):
-        if isinstance(data, list):
-            await self.redis.set("genres", data, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
-        else:
-            await self.redis.set(f"genre_{data.id}", data.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
 
 @lru_cache()

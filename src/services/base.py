@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from aioredis import Redis
+from core.config import FILM_CACHE_EXPIRE_IN_SECONDS
 from elasticsearch import AsyncElasticsearch
 
 
@@ -26,9 +27,8 @@ class BaseService(ABC):
     async def get_from_cache(self, entity_id: Optional[str] = None):
         pass
 
-    @abstractmethod
-    async def cache(self, data: Union[list, Any]):
-        pass
+    async def cache(self, key: str, data: Union[dict, list]):
+        await self.redis.set(key, data, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
     @abstractmethod
     async def get_list(self, es_query: Optional[dict] = None):

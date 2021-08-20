@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-class SortField(str, Enum):
+class SortFieldFilm(str, Enum):
     ID = "id"
     TITLE = "title"
     IMDB_RATING = "imdb_rating"
@@ -22,14 +22,14 @@ class SortField(str, Enum):
 async def film_list(
     search_query: Optional[str] = None,
     sort_order: SortOrder = SortOrder.ASC,
-    sort: SortField = SortField.ID,
+    sort: SortFieldFilm = SortFieldFilm.ID,
     page: int = 1,
     limit: int = 50,
     film_service: FilmService = Depends(get_film_service),  # noqa B008
 ) -> list[Film]:
     sort_value = sort.value
-    if sort_value == SortField.TITLE.value:
-        sort_value = f"{SortField.TITLE.value}.raw"
+    if sort_value == SortFieldFilm.TITLE.value:
+        sort_value = f"{SortFieldFilm.TITLE.value}.raw"
 
     es_query = {
         "size": limit,

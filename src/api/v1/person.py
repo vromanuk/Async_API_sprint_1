@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-class SortField(str, Enum):
+class SortFieldPerson(str, Enum):
     ID = "id"
     FIRST_NAME = "first_name"
     LAST_NAME = "last_name"
@@ -22,13 +22,13 @@ class SortField(str, Enum):
 async def people_list(
     search_query: Optional[str] = None,
     sort_order: SortOrder = SortOrder.ASC,
-    sort: SortField = SortField.ID,
+    sort: SortFieldPerson = SortFieldPerson.ID,
     page: int = 1,
     limit: int = 50,
     person_service: PersonService = Depends(get_person_service),  # noqa B008
 ) -> list[Person]:
     sort_value = sort.value
-    if sort_value in [SortField.FIRST_NAME.value, SortField.LAST_NAME.value]:
+    if sort_value in [SortFieldPerson.FIRST_NAME.value, SortFieldPerson.LAST_NAME.value]:
         sort_value = f"{sort_value}.raw"
 
     es_query = {

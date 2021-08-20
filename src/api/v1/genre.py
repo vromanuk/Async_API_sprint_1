@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-class SortField(str, Enum):
+class SortFieldGenre(str, Enum):
     ID = "id"
     GENRE = "genre"
 
@@ -21,14 +21,14 @@ class SortField(str, Enum):
 async def genre_list(
     search_query: Optional[str] = None,
     sort_order: SortOrder = SortOrder.ASC,
-    sort: SortField = SortField.ID,
+    sort: SortFieldGenre = SortFieldGenre.ID,
     page: int = 1,
     limit: int = 50,
     genre_service: GenreService = Depends(get_genre_service),  # noqa B008
 ) -> list[Genre]:
     sort_value = sort.value
-    if sort_value == SortField.GENRE.value:
-        sort_value = f"{SortField.GENRE.value}.raw"
+    if sort_value == SortFieldGenre.GENRE.value:
+        sort_value = f"{SortFieldGenre.GENRE.value}.raw"
 
     es_query = {
         "size": limit,

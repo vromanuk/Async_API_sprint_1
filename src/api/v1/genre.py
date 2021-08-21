@@ -26,6 +26,7 @@ async def genre_list(
     limit: int = 50,
     genre_service: GenreService = Depends(get_genre_service),  # noqa B008
 ) -> list[Genre]:
+    redis_key = f"{sort_order.lower()}_{sort.lower()}_{page}_{limit}"
     sort_value = sort.value
     if sort_value == SortFieldGenre.GENRE.value:
         sort_value = f"{SortFieldGenre.GENRE.value}.raw"
@@ -46,7 +47,7 @@ async def genre_list(
             }
         }
 
-    genres = await genre_service.get_list(es_query)
+    genres = await genre_service.get_list(redis_key, es_query)
     if not genres:
         return []
 

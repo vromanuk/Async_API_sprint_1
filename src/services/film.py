@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from aioredis import Redis
 from db.elastic import get_elastic
@@ -13,7 +13,7 @@ from services.base import BaseService
 class FilmService(BaseService):
     async def get_by_id(self, film_id: str) -> Optional[Film]:
         key = f"film_{film_id}"
-        film = await self.get_from_cache(key)
+        film = await self.get_from_cache_scalar(key)
         if not film:
             film = await self.get_from_elastic_scalar(film_id)
             if not film:
@@ -22,13 +22,13 @@ class FilmService(BaseService):
 
         return film
 
-    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Film]]:
-        films = await self.get_from_cache()
+    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> Optional[list[Film]]:
+        films = await self.get_from_cache_many(redis_key)
         if not films:
             films = await self.get_from_elastic_many(es_query)
             if not films:
                 return None
-            await self.cache("films", films)
+            await self.cache(redis_key, films)
 
         return films
 
@@ -52,15 +52,16 @@ class FilmService(BaseService):
             )
         return [Film(**film["_source"]) for film in doc]
 
-    async def get_from_cache(self, film_id: Optional[str] = None) -> Optional[Union[Film, List[Film]]]:
-        if film_id:
-            data = await self.redis.get(film_id)
-            if not data:
-                return None
+    async def get_from_cache_scalar(self, film_id: str) -> Optional[Film]:
+        data = await self.redis.get(film_id)
+        if not data:
+            return None
 
-            film = Film.parse_raw(data)
-            return film
-        data = await self.redis.get("films")
+        film = Film.parse_raw(data)
+        return film
+
+    async def get_from_cache_many(self, key: str) -> Optional[List[Film]]:
+        data = await self.redis.get(key)
         if not data:
             return None
 

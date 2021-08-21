@@ -24,12 +24,16 @@ class BaseService(ABC):
         pass
 
     @abstractmethod
-    async def get_from_cache(self, entity_id: Optional[str] = None):
+    async def get_from_cache_scalar(self, entity_id: str):
+        pass
+
+    @abstractmethod
+    async def get_from_cache_many(self, key: str):
         pass
 
     async def cache(self, key: str, data: Union[dict, list]):
         await self.redis.set(key, data, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
     @abstractmethod
-    async def get_list(self, es_query: Optional[dict] = None):
+    async def get_list(self, redis_key: str, es_query: Optional[dict] = None):
         pass

@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from aioredis import Redis
 from db.elastic import get_elastic
@@ -13,7 +13,7 @@ from services.base import BaseService
 class PersonService(BaseService):
     async def get_by_id(self, person_id: str) -> Optional[Person]:
         key = f"person_{person_id}"
-        person = await self.get_from_cache(key)
+        person = await self.get_from_cache_scalar(key)
         if not person:
             person = await self.get_from_elastic_scalar(person_id)
             if not person:
@@ -22,13 +22,13 @@ class PersonService(BaseService):
 
         return person
 
-    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Person]]:
-        people = await self.get_from_cache()
+    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> Optional[list[Person]]:
+        people = await self.get_from_cache_many(redis_key)
         if not people:
             people = await self.get_from_elastic_many(es_query)
             if not people:
                 return None
-            await self.cache("people", people)
+            await self.cache(redis_key, people)
 
         return people
 
@@ -52,15 +52,16 @@ class PersonService(BaseService):
         doc = await self.elastic.get("people", person_id)
         return Person(**doc["_source"])
 
-    async def get_from_cache(self, person_id: Optional[str] = None) -> Optional[Union[Person, List[Person]]]:
-        if person_id:
-            data = await self.redis.get(person_id)
-            if not data:
-                return None
+    async def get_from_cache_scalar(self, person_id: str) -> Optional[Person]:
+        data = await self.redis.get(person_id)
+        if not data:
+            return None
 
-            person = Person.parse_raw(data)
-            return person
-        data = await self.redis.get("people")
+        person = Person.parse_raw(data)
+        return person
+
+    async def get_from_cache_many(self, key: str) -> Optional[List[Person]]:
+        data = await self.redis.get(key)
         if not data:
             return None
 

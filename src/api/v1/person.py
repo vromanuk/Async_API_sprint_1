@@ -27,6 +27,7 @@ async def people_list(
     limit: int = 50,
     person_service: PersonService = Depends(get_person_service),  # noqa B008
 ) -> list[Person]:
+    redis_key = f"{sort_order.lower()}_{sort.lower()}_{page}_{limit}"
     sort_value = sort.value
     if sort_value in [SortFieldPerson.FIRST_NAME.value, SortFieldPerson.LAST_NAME.value]:
         sort_value = f"{sort_value}.raw"
@@ -47,7 +48,7 @@ async def people_list(
             }
         }
 
-    people = await person_service.get_list(es_query)
+    people = await person_service.get_list(redis_key, es_query)
     if not people:
         return []
 

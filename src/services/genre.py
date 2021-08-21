@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from aioredis import Redis
 from db.elastic import get_elastic
@@ -13,7 +13,7 @@ from services.base import BaseService
 class GenreService(BaseService):
     async def get_by_id(self, genre_id: str) -> Optional[Genre]:
         key = f"genre_{genre_id}"
-        genre = await self.get_from_cache(key)
+        genre = await self.get_from_cache_scalar(key)
         if not genre:
             genre = await self.get_from_elastic_scalar(genre_id)
             if not genre:
@@ -22,13 +22,13 @@ class GenreService(BaseService):
 
         return genre
 
-    async def get_list(self, es_query: Optional[dict] = None) -> Optional[list[Genre]]:
-        genres = await self.get_from_cache()
+    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> Optional[list[Genre]]:
+        genres = await self.get_from_cache_many(redis_key)
         if not genres:
             genres = await self.get_from_elastic_many(es_query)
             if not genres:
                 return None
-            await self.cache("genres", genres)
+            await self.cache(redis_key, genres)
 
         return genres
 
@@ -52,15 +52,16 @@ class GenreService(BaseService):
         doc = await self.elastic.get("genres", genre_id)
         return Genre(**doc["_source"])
 
-    async def get_from_cache(self, genre_id: Optional[str] = None) -> Optional[Union[Genre, List[Genre]]]:
-        if genre_id:
-            data = await self.redis.get(genre_id)
-            if not data:
-                return None
+    async def get_from_cache_scalar(self, genre_id: str) -> Optional[Genre]:
+        data = await self.redis.get(genre_id)
+        if not data:
+            return None
 
-            genre = Genre.parse_raw(data)
-            return genre
-        data = await self.redis.get("genres")
+        genre = Genre.parse_raw(data)
+        return genre
+
+    async def get_from_cache_many(self, key: str) -> Optional[List[Genre]]:
+        data = await self.redis.get(key)
         if not data:
             return None
 

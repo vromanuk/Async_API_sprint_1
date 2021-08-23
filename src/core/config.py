@@ -10,6 +10,6 @@ ELASTIC_PORT = int(os.getenv("ELASTIC_PORT", 9200))
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
+CACHE_TTL = int(os.getenv("CACHE_TTL", 60 * 5))  # 5 минут
 
 API_V1_PREFIX = "/v1"

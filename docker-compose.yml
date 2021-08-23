@@ -21,8 +21,6 @@ services:
         hard: -1
     volumes:
       - es_data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
     networks:
       - internal
 

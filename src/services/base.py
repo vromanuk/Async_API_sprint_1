@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union
 
 from aioredis import Redis
-from core.config import FILM_CACHE_EXPIRE_IN_SECONDS
+from core.config import CACHE_TTL
 from elasticsearch import AsyncElasticsearch
 
 
@@ -32,7 +32,7 @@ class BaseService(ABC):
         pass
 
     async def cache(self, key: str, data: Union[dict, list]):
-        await self.redis.set(key, data, expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+        await self.redis.set(key, data, expire=CACHE_TTL)
 
     @abstractmethod
     async def get_list(self, redis_key: str, es_query: Optional[dict] = None):

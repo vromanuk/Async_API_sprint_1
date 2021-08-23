@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import List, Optional
+from typing import Optional
 
 from aioredis import Redis
 from db.elastic import get_elastic
@@ -22,12 +22,12 @@ class GenreService(BaseService):
 
         return genre
 
-    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> Optional[list[Genre]]:
+    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> list[Genre]:
         genres = await self.get_from_cache_many(redis_key)
         if not genres:
             genres = await self.get_from_elastic_many(es_query)
-            if not genres:
-                return None
+            if genres is None:
+                return []
             await self.cache(redis_key, genres)
 
         return genres
@@ -60,7 +60,7 @@ class GenreService(BaseService):
         genre = Genre.parse_raw(data)
         return genre
 
-    async def get_from_cache_many(self, key: str) -> Optional[List[Genre]]:
+    async def get_from_cache_many(self, key: str) -> Optional[list[Genre]]:
         data = await self.redis.get(key)
         if not data:
             return None

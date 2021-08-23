@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import List, Optional
+from typing import Optional
 
 from aioredis import Redis
 from db.elastic import get_elastic
@@ -22,12 +22,12 @@ class PersonService(BaseService):
 
         return person
 
-    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> Optional[list[Person]]:
+    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> list[Person]:
         people = await self.get_from_cache_many(redis_key)
         if not people:
             people = await self.get_from_elastic_many(es_query)
-            if not people:
-                return None
+            if people is None:
+                return []
             await self.cache(redis_key, people)
 
         return people
@@ -60,7 +60,7 @@ class PersonService(BaseService):
         person = Person.parse_raw(data)
         return person
 
-    async def get_from_cache_many(self, key: str) -> Optional[List[Person]]:
+    async def get_from_cache_many(self, key: str) -> Optional[list[Person]]:
         data = await self.redis.get(key)
         if not data:
             return None

@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import List, Optional
+from typing import Optional
 
 from aioredis import Redis
 from db.elastic import get_elastic
@@ -22,12 +22,12 @@ class FilmService(BaseService):
 
         return film
 
-    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> Optional[list[Film]]:
+    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> list[Film]:
         films = await self.get_from_cache_many(redis_key)
         if not films:
             films = await self.get_from_elastic_many(es_query)
-            if not films:
-                return None
+            if films is None:
+                return []
             await self.cache(redis_key, films)
 
         return films
@@ -60,7 +60,7 @@ class FilmService(BaseService):
         film = Film.parse_raw(data)
         return film
 
-    async def get_from_cache_many(self, key: str) -> Optional[List[Film]]:
+    async def get_from_cache_many(self, key: str) -> Optional[list[Film]]:
         data = await self.redis.get(key)
         if not data:
             return None

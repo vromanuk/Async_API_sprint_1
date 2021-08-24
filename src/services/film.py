@@ -1,7 +1,6 @@
 from functools import lru_cache
 from typing import Optional
 
-from aioredis import Redis
 from db.elastic import get_elastic
 from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch
@@ -18,17 +17,17 @@ class FilmService(BaseService):
             film = await self.get_from_elastic_scalar(film_id)
             if not film:
                 return None
-            await self.cache(key, film.json())
+            await self.cache.cache(key, film.json())
 
         return film
 
-    async def get_list(self, redis_key: str, es_query: Optional[dict] = None) -> list[Film]:
-        films = await self.get_from_cache_many(redis_key)
+    async def get_list(self, cache_key: str, es_query: Optional[dict] = None) -> list[Film]:
+        films = await self.get_from_cache_many(cache_key)
         if not films:
             films = await self.get_from_elastic_many(es_query)
             if films is None:
                 return []
-            await self.cache(redis_key, films)
+            await self.cache.cache(cache_key, films)
 
         return films
 
@@ -53,7 +52,7 @@ class FilmService(BaseService):
         return [Film(**film["_source"]) for film in doc]
 
     async def get_from_cache_scalar(self, film_id: str) -> Optional[Film]:
-        data = await self.redis.get(film_id)
+        data = await self.cache.get_from_cache_scalar(film_id)
         if not data:
             return None
 
@@ -61,7 +60,7 @@ class FilmService(BaseService):
         return film
 
     async def get_from_cache_many(self, key: str) -> Optional[list[Film]]:
-        data = await self.redis.get(key)
+        data = await self.cache.get_from_cache_many(key)
         if not data:
             return None
 
@@ -71,7 +70,7 @@ class FilmService(BaseService):
 
 @lru_cache()
 def get_film_service(
-    redis: Redis = Depends(get_redis),  # noqa B008
+    cache: RedisCache = Depends(get_redis),  # noqa B008
     elastic: AsyncElasticsearch = Depends(get_elastic),  # noqa B008
 ) -> FilmService:
-    return FilmService(redis, elastic)
+    return FilmService(cache, elastic)

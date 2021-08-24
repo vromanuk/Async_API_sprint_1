@@ -1,14 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union
 
-from aioredis import Redis
-from core.config import CACHE_TTL
 from elasticsearch import AsyncElasticsearch
+from services.base_cache import BaseCache
 
 
 class BaseService(ABC):
-    def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
-        self.redis = redis
+    def __init__(self, cache: BaseCache, elastic: AsyncElasticsearch):
+        self.cache = cache
         self.elastic = elastic
 
     @abstractmethod
@@ -32,7 +31,7 @@ class BaseService(ABC):
         pass
 
     async def cache(self, key: str, data: Union[dict, list]):
-        await self.redis.set(key, data, expire=CACHE_TTL)
+        await self.cache.cache(key, data)
 
     @abstractmethod
     async def get_list(self, redis_key: str, es_query: Optional[dict] = None):

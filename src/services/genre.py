@@ -52,7 +52,7 @@ class GenreService(BaseService):
         return Genre(**doc["_source"])
 
     async def get_from_cache_scalar(self, genre_id: str) -> Optional[Genre]:
-        data = await self.cache.get_from_cache_scalar(genre_id)
+        data = await self.cache.get_from_cache(genre_id)
         if not data:
             return None
 
@@ -60,7 +60,7 @@ class GenreService(BaseService):
         return genre
 
     async def get_from_cache_many(self, key: str) -> Optional[list[Genre]]:
-        data = await self.cache.get_from_cache_many(key)
+        data = await self.cache.get_from_cache(key)
         if not data:
             return None
 

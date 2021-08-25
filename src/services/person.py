@@ -52,7 +52,7 @@ class PersonService(BaseService):
         return Person(**doc["_source"])
 
     async def get_from_cache_scalar(self, person_id: str) -> Optional[Person]:
-        data = await self.cache.get_from_cache_scalar(person_id)
+        data = await self.cache.get_from_cache(person_id)
         if not data:
             return None
 
@@ -60,7 +60,7 @@ class PersonService(BaseService):
         return person
 
     async def get_from_cache_many(self, key: str) -> Optional[list[Person]]:
-        data = await self.cache.get_from_cache_many(key)
+        data = await self.cache.get_from_cache(key)
         if not data:
             return None
 

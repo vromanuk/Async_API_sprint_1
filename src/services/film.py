@@ -52,7 +52,7 @@ class FilmService(BaseService):
         return [Film(**film["_source"]) for film in doc]
 
     async def get_from_cache_scalar(self, film_id: str) -> Optional[Film]:
-        data = await self.cache.get_from_cache_scalar(film_id)
+        data = await self.cache.get_from_cache(film_id)
         if not data:
             return None
 
@@ -60,7 +60,7 @@ class FilmService(BaseService):
         return film
 
     async def get_from_cache_many(self, key: str) -> Optional[list[Film]]:
-        data = await self.cache.get_from_cache_many(key)
+        data = await self.cache.get_from_cache(key)
         if not data:
             return None
 

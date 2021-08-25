@@ -27,7 +27,7 @@ async def people_list(
     limit: int = 50,
     person_service: PersonService = Depends(get_person_service),  # noqa B008
 ) -> list[Person]:
-    redis_key = str(hash(f"{search_query}_{sort_order.lower()}_{sort.lower()}_{page}_{limit}"))
+    cache_key = f"{search_query}:{sort_order.lower()}:{sort.lower()}:{page}:{limit}"
     sort_value = sort.value
     if sort_value in [SortFieldPerson.FIRST_NAME.value, SortFieldPerson.LAST_NAME.value]:
         sort_value = f"{sort_value}.raw"
@@ -48,7 +48,7 @@ async def people_list(
             }
         }
 
-    return await person_service.get_list(redis_key, es_query)
+    return await person_service.get_list(cache_key, es_query)
 
 
 @router.get("/{person_id}", response_model=Person)

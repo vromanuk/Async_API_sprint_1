@@ -26,7 +26,7 @@ async def genre_list(
     limit: int = 50,
     genre_service: GenreService = Depends(get_genre_service),  # noqa B008
 ) -> list[Genre]:
-    redis_key = str(hash(f"{search_query}_{sort_order.lower()}_{sort.lower()}_{page}_{limit}"))
+    cache_key = f"{search_query}:{sort_order.lower()}:{sort.lower()}:{page}:{limit}"
     sort_value = sort.value
     if sort_value == SortFieldGenre.GENRE.value:
         sort_value = f"{SortFieldGenre.GENRE.value}.raw"
@@ -47,7 +47,7 @@ async def genre_list(
             }
         }
 
-    return await genre_service.get_list(redis_key, es_query)
+    return await genre_service.get_list(cache_key, es_query)
 
 
 @router.get("/{genre_id}", response_model=Genre)

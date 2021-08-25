@@ -27,7 +27,7 @@ async def film_list(
     limit: int = 50,
     film_service: FilmService = Depends(get_film_service),  # noqa B008
 ) -> list[Film]:
-    redis_key = str(hash(f"{search_query}_{sort_order.lower()}_{sort.lower()}_{page}_{limit}"))
+    cache_key = f"{search_query}:{sort_order.lower()}:{sort.lower()}:{page}:{limit}"
     sort_value = sort.value
     if sort_value == SortFieldFilm.TITLE.value:
         sort_value = f"{SortFieldFilm.TITLE.value}.raw"
@@ -48,7 +48,7 @@ async def film_list(
             }
         }
 
-    return await film_service.get_list(redis_key, es_query)
+    return await film_service.get_list(cache_key, es_query)
 
 
 @router.get("/{film_id}", response_model=Film)

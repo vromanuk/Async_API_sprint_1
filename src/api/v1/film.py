@@ -6,6 +6,7 @@ from constants import SortOrder
 from fastapi import APIRouter, Depends, HTTPException
 from models.film import Film
 from services.film import FilmService, get_film_service
+from utils import cached
 
 router = APIRouter(
     prefix="/films",
@@ -19,15 +20,15 @@ class SortFieldFilm(str, Enum):
 
 
 @router.get("/", response_model=list[Film])
+@cached(decoder=Film, many=True)
 async def film_list(
-    search_query: Optional[str] = None,
+    search_query: Optional[str] = "",
     sort_order: SortOrder = SortOrder.ASC,
     sort: SortFieldFilm = SortFieldFilm.ID,
     page: int = 1,
     limit: int = 50,
     film_service: FilmService = Depends(get_film_service),  # noqa B008
 ) -> list[Film]:
-    cache_key = f"{search_query}:{sort_order.lower()}:{sort.lower()}:{page}:{limit}"
     sort_value = sort.value
     if sort_value == SortFieldFilm.TITLE.value:
         sort_value = f"{SortFieldFilm.TITLE.value}.raw"
@@ -48,10 +49,11 @@ async def film_list(
             }
         }
 
-    return await film_service.get_list(cache_key, es_query)
+    return await film_service.get_list(es_query)
 
 
 @router.get("/{film_id}", response_model=Film)
+@cached(decoder=Film)
 async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> Film:  # noqa B008
     film = await film_service.get_by_id(film_id)
     if not film:

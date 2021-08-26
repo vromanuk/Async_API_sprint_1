@@ -6,6 +6,7 @@ from constants import SortOrder
 from fastapi import APIRouter, Depends, HTTPException
 from models.genre import Genre
 from services.genre import GenreService, get_genre_service
+from utils import cached
 
 router = APIRouter(
     prefix="/genres",
@@ -18,15 +19,15 @@ class SortFieldGenre(str, Enum):
 
 
 @router.get("/", response_model=list[Genre])
+@cached(decoder=Genre)
 async def genre_list(
-    search_query: Optional[str] = None,
+    search_query: Optional[str] = "",
     sort_order: SortOrder = SortOrder.ASC,
     sort: SortFieldGenre = SortFieldGenre.ID,
     page: int = 1,
     limit: int = 50,
     genre_service: GenreService = Depends(get_genre_service),  # noqa B008
 ) -> list[Genre]:
-    cache_key = f"{search_query}:{sort_order.lower()}:{sort.lower()}:{page}:{limit}"
     sort_value = sort.value
     if sort_value == SortFieldGenre.GENRE.value:
         sort_value = f"{SortFieldGenre.GENRE.value}.raw"
@@ -47,10 +48,11 @@ async def genre_list(
             }
         }
 
-    return await genre_service.get_list(cache_key, es_query)
+    return await genre_service.get_list(es_query)
 
 
 @router.get("/{genre_id}", response_model=Genre)
+@cached(decoder=Genre)
 async def genre_details(genre_id: str, genre_service: GenreService = Depends(get_genre_service)) -> Genre:  # noqa B008
     genre = await genre_service.get_by_id(genre_id)
     if not genre:

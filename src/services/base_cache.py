@@ -19,10 +19,11 @@ class RedisCache(BaseCache):
     def __init__(self, redis: Redis):
         self.redis = redis
 
-    async def cache(self, key: str, data: Union[dict, list]):
+    async def cache(self, key: str, data: Union[dict, bytes]):
         await self.redis.set(key, data, expire=CACHE_TTL)
 
-    async def get_from_cache(self, key: str) -> Optional[list]:
+    async def get_from_cache(self, key: str) -> Optional[bytes]:
         data = await self.redis.get(key)
         if not data:
             return None
+        return data

@@ -6,6 +6,7 @@ from constants import SortOrder
 from fastapi import APIRouter, Depends, HTTPException
 from models.person import Person
 from services.person import PersonService, get_person_service
+from utils import cached
 
 router = APIRouter(
     prefix="/people",
@@ -19,15 +20,15 @@ class SortFieldPerson(str, Enum):
 
 
 @router.get("/", response_model=list[Person])
+@cached(decoder=Person)
 async def people_list(
-    search_query: Optional[str] = None,
+    search_query: Optional[str] = "",
     sort_order: SortOrder = SortOrder.ASC,
     sort: SortFieldPerson = SortFieldPerson.ID,
     page: int = 1,
     limit: int = 50,
     person_service: PersonService = Depends(get_person_service),  # noqa B008
 ) -> list[Person]:
-    cache_key = f"{search_query}:{sort_order.lower()}:{sort.lower()}:{page}:{limit}"
     sort_value = sort.value
     if sort_value in [SortFieldPerson.FIRST_NAME.value, SortFieldPerson.LAST_NAME.value]:
         sort_value = f"{sort_value}.raw"
@@ -48,10 +49,11 @@ async def people_list(
             }
         }
 
-    return await person_service.get_list(cache_key, es_query)
+    return await person_service.get_list(es_query)
 
 
 @router.get("/{person_id}", response_model=Person)
+@cached(decoder=Person)
 async def person_details(
     person_id: str, person_service: PersonService = Depends(get_person_service)  # noqa B008
 ) -> Person:

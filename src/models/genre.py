@@ -2,7 +2,8 @@ import datetime
 
 import orjson
 from pydantic import BaseModel
-from utils import orjson_dumps
+
+from src.utils import orjson_dumps
 
 
 class Genre(BaseModel):

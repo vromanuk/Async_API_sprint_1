@@ -3,8 +3,6 @@ version: '3.9'
 services:
   redis:
     image: redis
-    networks:
-      - default
 
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
@@ -21,23 +19,19 @@ services:
         hard: -1
     volumes:
       - es_data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-    networks:
-      - default
 
   web:
     build: .
-    ports:
-      - "8000:8000"
     depends_on:
       - es01
       - redis
-    networks:
-      - default
 
+  nginx:
+    build: ./src/nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - web
 
-networks:
-  default:
 volumes:
   es_data:

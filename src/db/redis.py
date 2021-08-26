@@ -1,8 +1,12 @@
+from functools import lru_cache
+
 from aioredis import Redis
+
+from src.services.base_cache import RedisCache
 
 redis: Redis = None
 
 
-# Функция понадобится при внедрении зависимостей
-async def get_redis() -> Redis:
-    return redis
+@lru_cache()
+async def get_redis() -> RedisCache:
+    return RedisCache(redis)

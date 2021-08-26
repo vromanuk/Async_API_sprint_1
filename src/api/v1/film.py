@@ -2,34 +2,37 @@ from enum import Enum
 from http import HTTPStatus
 from typing import Optional
 
-from constants import SortOrder
 from fastapi import APIRouter, Depends, HTTPException
-from models.film import Film
-from services.film import FilmService, get_film_service
+
+from src.constants import SortOrder
+from src.models.film import Film
+from src.services.film import FilmService, get_film_service
+from src.utils import cached
 
 router = APIRouter(
     prefix="/films",
 )
 
 
-class SortField(str, Enum):
+class SortFieldFilm(str, Enum):
     ID = "id"
     TITLE = "title"
     IMDB_RATING = "imdb_rating"
 
 
 @router.get("/", response_model=list[Film])
+@cached(decoder=Film, many=True)
 async def film_list(
-    search_query: Optional[str] = None,
+    search_query: Optional[str] = "",
     sort_order: SortOrder = SortOrder.ASC,
-    sort: SortField = SortField.ID,
+    sort: SortFieldFilm = SortFieldFilm.ID,
     page: int = 1,
     limit: int = 50,
     film_service: FilmService = Depends(get_film_service),  # noqa B008
 ) -> list[Film]:
     sort_value = sort.value
-    if sort_value == SortField.TITLE.value:
-        sort_value = f"{SortField.TITLE.value}.raw"
+    if sort_value == SortFieldFilm.TITLE.value:
+        sort_value = f"{SortFieldFilm.TITLE.value}.raw"
 
     es_query = {
         "size": limit,
@@ -47,14 +50,11 @@ async def film_list(
             }
         }
 
-    films = await film_service.get_films(es_query)
-    if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="there are no films")
-
-    return films
+    return await film_service.get_list(es_query)
 
 
 @router.get("/{film_id}", response_model=Film)
+@cached(decoder=Film)
 async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> Film:  # noqa B008
     film = await film_service.get_by_id(film_id)
     if not film:

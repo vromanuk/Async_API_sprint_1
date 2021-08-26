@@ -2,33 +2,36 @@ from enum import Enum
 from http import HTTPStatus
 from typing import Optional
 
-from constants import SortOrder
 from fastapi import APIRouter, Depends, HTTPException
-from models.person import Person
-from services.person import PersonService, get_person_service
+
+from src.constants import SortOrder
+from src.models.person import Person
+from src.services.person import PersonService, get_person_service
+from src.utils import cached
 
 router = APIRouter(
     prefix="/people",
 )
 
 
-class SortField(str, Enum):
+class SortFieldPerson(str, Enum):
     ID = "id"
     FIRST_NAME = "first_name"
     LAST_NAME = "last_name"
 
 
 @router.get("/", response_model=list[Person])
+@cached(decoder=Person)
 async def people_list(
-    search_query: Optional[str] = None,
+    search_query: Optional[str] = "",
     sort_order: SortOrder = SortOrder.ASC,
-    sort: SortField = SortField.ID,
+    sort: SortFieldPerson = SortFieldPerson.ID,
     page: int = 1,
     limit: int = 50,
     person_service: PersonService = Depends(get_person_service),  # noqa B008
 ) -> list[Person]:
     sort_value = sort.value
-    if sort_value in [SortField.FIRST_NAME.value, SortField.LAST_NAME.value]:
+    if sort_value in [SortFieldPerson.FIRST_NAME.value, SortFieldPerson.LAST_NAME.value]:
         sort_value = f"{sort_value}.raw"
 
     es_query = {
@@ -47,14 +50,11 @@ async def people_list(
             }
         }
 
-    people = await person_service.get_people(es_query)
-    if not people:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="there are no people")
-
-    return people
+    return await person_service.get_list(es_query)
 
 
 @router.get("/{person_id}", response_model=Person)
+@cached(decoder=Person)
 async def person_details(
     person_id: str, person_service: PersonService = Depends(get_person_service)  # noqa B008
 ) -> Person:

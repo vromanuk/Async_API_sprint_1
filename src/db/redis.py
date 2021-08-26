@@ -1,5 +1,6 @@
 from aioredis import Redis
-from services.base_cache import RedisCache
+
+from src.services.base_cache import RedisCache
 
 redis: Redis = None
 

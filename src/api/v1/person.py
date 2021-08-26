@@ -2,11 +2,12 @@ from enum import Enum
 from http import HTTPStatus
 from typing import Optional
 
-from constants import SortOrder
 from fastapi import APIRouter, Depends, HTTPException
-from models.person import Person
-from services.person import PersonService, get_person_service
-from utils import cached
+
+from src.constants import SortOrder
+from src.models.person import Person
+from src.services.person import PersonService, get_person_service
+from src.utils import cached
 
 router = APIRouter(
     prefix="/people",

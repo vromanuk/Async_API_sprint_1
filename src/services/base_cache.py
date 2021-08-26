@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union
 
 from aioredis import Redis
-from core.config import CACHE_TTL
+
+from src.core.config import CACHE_TTL
 
 
 class BaseCache(ABC):

@@ -3,13 +3,14 @@ from logging import config as logging_config
 
 import aioredis
 import uvicorn as uvicorn
-from core import config
-from core.logger import LOGGING
-from db import elastic, redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from routes import api_router
+
+from src.core import config
+from src.core.logger import LOGGING
+from src.db import elastic, redis
+from src.routes import api_router
 
 app = FastAPI(
     title=config.PROJECT_NAME,

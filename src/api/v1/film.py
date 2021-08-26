@@ -2,11 +2,12 @@ from enum import Enum
 from http import HTTPStatus
 from typing import Optional
 
-from constants import SortOrder
 from fastapi import APIRouter, Depends, HTTPException
-from models.film import Film
-from services.film import FilmService, get_film_service
-from utils import cached
+
+from src.constants import SortOrder
+from src.models.film import Film
+from src.services.film import FilmService, get_film_service
+from src.utils import cached
 
 router = APIRouter(
     prefix="/films",

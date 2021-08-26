@@ -2,11 +2,12 @@ from enum import Enum
 from http import HTTPStatus
 from typing import Optional
 
-from constants import SortOrder
 from fastapi import APIRouter, Depends, HTTPException
-from models.genre import Genre
-from services.genre import GenreService, get_genre_service
-from utils import cached
+
+from src.constants import SortOrder
+from src.models.genre import Genre
+from src.services.genre import GenreService, get_genre_service
+from src.utils import cached
 
 router = APIRouter(
     prefix="/genres",

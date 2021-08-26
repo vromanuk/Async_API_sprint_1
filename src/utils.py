@@ -1,7 +1,8 @@
 from functools import wraps
 
 import orjson
-from db.redis import get_redis
+
+from src.db.redis import get_redis
 
 
 def orjson_dumps(v, *, default):

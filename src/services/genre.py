@@ -1,11 +1,12 @@
 from functools import lru_cache
 from typing import Optional
 
-from db.elastic import get_elastic
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-from models.genre import Genre
-from services.base import BaseService
+
+from src.db.elastic import get_elastic
+from src.models.genre import Genre
+from src.services.base import BaseService
 
 
 class GenreService(BaseService):

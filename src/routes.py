@@ -1,5 +1,6 @@
-from api.v1 import film, genre, person
 from fastapi import APIRouter
+
+from src.api.v1 import film, genre, person
 
 api_router = APIRouter()
 

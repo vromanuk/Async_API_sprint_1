@@ -12,8 +12,6 @@ repos:
       - id: check-merge-conflict
       - id: debug-statements
       - id: end-of-file-fixer
-      - id: name-tests-test
-        args: [ "--django" ]
       - id: trailing-whitespace
   - repo: https://github.com/asottile/seed-isort-config
     rev: v2.2.0

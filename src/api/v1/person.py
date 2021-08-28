@@ -25,7 +25,6 @@ class SortFieldPerson(str, Enum):
     response_model=list[Person],
     summary="Получение списка участников в произведении",
     response_description="Список участников в произведении",
-    tags=["people_list"],
 )
 @cached(decoder=Person)
 async def people_list(
@@ -64,7 +63,6 @@ async def people_list(
     response_model=Person,
     summary="Получение информации о конкретной личности",
     response_description="Информация о конкретной личности",
-    tags=["person_details"],
 )
 @cached(decoder=Person)
 async def person_details(

@@ -25,7 +25,6 @@ class SortFieldFilm(str, Enum):
     response_model=list[Film],
     summary="Получение списка произведений",
     response_description="Список произведений",
-    tags=["film_list"],
 )
 @cached(decoder=Film, many=True)
 async def film_list(
@@ -64,7 +63,6 @@ async def film_list(
     response_model=Film,
     summary="Получение информации о конкретном произведении",
     response_description="Информация о конкретном произведении",
-    tags=["film_details"],
 )
 @cached(decoder=Film)
 async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> Film:  # noqa B008

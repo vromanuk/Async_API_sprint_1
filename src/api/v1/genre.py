@@ -24,7 +24,6 @@ class SortFieldGenre(str, Enum):
     response_model=list[Genre],
     summary="Получение списка жанров",
     response_description="Список жанров",
-    tags=["genres_list"],
 )
 @cached(decoder=Genre)
 async def genre_list(
@@ -63,7 +62,6 @@ async def genre_list(
     response_model=Genre,
     summary="Получение информации о конкретном жанре",
     response_description="Информация о конкретном жанре",
-    tags=["genre_details"],
 )
 @cached(decoder=Genre)
 async def genre_details(genre_id: str, genre_service: GenreService = Depends(get_genre_service)) -> Genre:  # noqa B008

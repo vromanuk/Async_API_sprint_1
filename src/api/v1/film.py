@@ -20,7 +20,13 @@ class SortFieldFilm(str, Enum):
     IMDB_RATING = "imdb_rating"
 
 
-@router.get("/", response_model=list[Film])
+@router.get(
+    "/",
+    response_model=list[Film],
+    summary="Получение списка произведений",
+    response_description="Список произведений",
+    tags=["film_list"],
+)
 @cached(decoder=Film, many=True)
 async def film_list(
     search_query: Optional[str] = "",
@@ -53,7 +59,13 @@ async def film_list(
     return await film_service.get_list(es_query)
 
 
-@router.get("/{film_id}", response_model=Film)
+@router.get(
+    "/{film_id}",
+    response_model=Film,
+    summary="Получение информации о конкретном произведении",
+    response_description="Информация о конкретном произведении",
+    tags=["film_details"],
+)
 @cached(decoder=Film)
 async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> Film:  # noqa B008
     film = await film_service.get_by_id(film_id)

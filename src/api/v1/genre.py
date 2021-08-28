@@ -19,7 +19,13 @@ class SortFieldGenre(str, Enum):
     GENRE = "genre"
 
 
-@router.get("/", response_model=list[Genre])
+@router.get(
+    "/",
+    response_model=list[Genre],
+    summary="Получение списка жанров",
+    response_description="Список жанров",
+    tags=["genres_list"],
+)
 @cached(decoder=Genre)
 async def genre_list(
     search_query: Optional[str] = "",
@@ -52,7 +58,13 @@ async def genre_list(
     return await genre_service.get_list(es_query)
 
 
-@router.get("/{genre_id}", response_model=Genre)
+@router.get(
+    "/{genre_id}",
+    response_model=Genre,
+    summary="Получение информации о конкретном жанре",
+    response_description="Информация о конкретном жанре",
+    tags=["genre_details"],
+)
 @cached(decoder=Genre)
 async def genre_details(genre_id: str, genre_service: GenreService = Depends(get_genre_service)) -> Genre:  # noqa B008
     genre = await genre_service.get_by_id(genre_id)

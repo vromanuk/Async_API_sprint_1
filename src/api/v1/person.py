@@ -20,7 +20,13 @@ class SortFieldPerson(str, Enum):
     LAST_NAME = "last_name"
 
 
-@router.get("/", response_model=list[Person])
+@router.get(
+    "/",
+    response_model=list[Person],
+    summary="Получение списка участников в произведении",
+    response_description="Список участников в произведении",
+    tags=["people_list"],
+)
 @cached(decoder=Person)
 async def people_list(
     search_query: Optional[str] = "",
@@ -53,7 +59,13 @@ async def people_list(
     return await person_service.get_list(es_query)
 
 
-@router.get("/{person_id}", response_model=Person)
+@router.get(
+    "/{person_id}",
+    response_model=Person,
+    summary="Получение информации о конкретной личности",
+    response_description="Информация о конкретной личности",
+    tags=["person_details"],
+)
 @cached(decoder=Person)
 async def person_details(
     person_id: str, person_service: PersonService = Depends(get_person_service)  # noqa B008

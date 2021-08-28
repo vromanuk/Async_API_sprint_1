@@ -5,8 +5,8 @@ from elasticsearch import AsyncElasticsearch
 from httpx import AsyncClient
 from multidict import CIMultiDictProxy
 
-from src.core.config import API_V1_PREFIX
 from src.main import app
+from src.tests.functional.settings import TestSettings, get_settings
 
 
 @dataclass
@@ -22,13 +22,18 @@ class HTTPResponse:
 
 
 @pytest.fixture(scope="session")
-async def es_client():
-    client = AsyncElasticsearch(hosts="127.0.0.1:9200")
+async def es_client(settings: TestSettings):
+    client = AsyncElasticsearch(hosts=settings.es_host)
     yield client
     await client.close()
 
 
 @pytest.fixture
-async def client():
-    async with AsyncClient(app=app, base_url=f"http://{API_V1_PREFIX}") as async_client:
+async def client(settings: TestSettings):
+    async with AsyncClient(app=app, base_url=settings.base_url) as async_client:
         yield async_client
+
+
+@pytest.fixture
+async def settings():
+    return get_settings()

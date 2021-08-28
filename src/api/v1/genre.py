@@ -18,6 +18,10 @@ class SortFieldGenre(str, Enum):
     ID = "id"
     GENRE = "genre"
 
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_
+
 
 @router.get(
     "/",
@@ -41,7 +45,7 @@ async def genre_list(
     es_query = {
         "size": limit,
         "from": (page - 1) * limit,
-        "sort": [{sort_value: sort_order.value}],
+        "sort": [f"{sort_value}:{sort_order.value}"],
         "_source": ["id", "genre"],
     }
 

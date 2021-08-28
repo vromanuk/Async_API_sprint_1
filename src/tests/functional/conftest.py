@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 
+import aioredis
 import pytest
 from elasticsearch import AsyncElasticsearch
 from httpx import AsyncClient
 from multidict import CIMultiDictProxy
 
+from src.db import elastic, redis
 from src.main import app
 from src.tests.functional.settings import TestSettings, get_settings
 
@@ -28,8 +30,15 @@ async def es_client(settings: TestSettings):
     await client.close()
 
 
+@pytest.fixture()
+async def setup(settings: TestSettings):
+    elastic.es = AsyncElasticsearch(hosts=[settings.es_host])
+    redis.redis = await aioredis.create_redis_pool((settings.redis_host, settings.redis_port), minsize=10, maxsize=20)
+    yield
+
+
 @pytest.fixture
-async def client(settings: TestSettings):
+async def client(setup, settings: TestSettings):
     async with AsyncClient(app=app, base_url=settings.base_url) as async_client:
         yield async_client
 

@@ -19,6 +19,10 @@ class SortFieldPerson(str, Enum):
     FIRST_NAME = "first_name"
     LAST_NAME = "last_name"
 
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_
+
 
 @router.get(
     "/",
@@ -42,7 +46,7 @@ async def people_list(
     es_query = {
         "size": limit,
         "from": (page - 1) * limit,
-        "sort": [{sort_value: sort_order.value}],
+        "sort": [f"{sort_value}:{sort_order.value}"],
         "_source": ["id", "first_name", "last_name"],
     }
 

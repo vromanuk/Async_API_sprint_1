@@ -1,4 +1,6 @@
+import json
 from dataclasses import dataclass
+from pathlib import Path
 
 import aioredis
 import pytest
@@ -9,6 +11,13 @@ from multidict import CIMultiDictProxy
 from src.db import elastic, redis
 from src.main import app
 from src.tests.functional.settings import TestSettings, get_settings
+
+
+def load_params_from_json(json_path):
+    script_location = Path(__file__).absolute().parent
+    file_location = script_location / json_path
+    with open(file_location) as f:
+        return json.load(f)
 
 
 @dataclass
@@ -23,7 +32,7 @@ class HTTPResponse:
         return self.status // 200 == 1
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def es_client(settings: TestSettings):
     client = AsyncElasticsearch(hosts=settings.es_host)
     yield client
@@ -46,3 +55,17 @@ async def client(setup, settings: TestSettings):
 @pytest.fixture
 async def settings():
     return get_settings()
+
+
+@pytest.fixture
+async def populate_es(es_client):
+    movies_raw = load_params_from_json("fixtures/initial_data.json")
+
+    await es_client.indices.create("movies")
+
+    for movie in movies_raw:
+        await es_client.index(index="movies", id=movie["id"], body=movie)
+
+    yield
+
+    await es_client.indices.delete(index="movies")

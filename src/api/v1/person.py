@@ -52,10 +52,12 @@ async def people_list(
 
     if search_query:
         es_query["query"] = {
-            "multi_match": {
-                "query": search_query,
-                "fuzziness": "auto",
-                "fields": ["first_name^2", "last_name^2"],
+            "query": {
+                "multi_match": {
+                    "query": search_query,
+                    "fuzziness": 1,
+                    "fields": ["first_name^2", "last_name^2"],
+                }
             }
         }
 

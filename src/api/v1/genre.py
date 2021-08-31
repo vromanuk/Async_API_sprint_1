@@ -51,10 +51,12 @@ async def genre_list(
 
     if search_query:
         es_query["query"] = {
-            "multi_match": {
-                "query": search_query,
-                "fuzziness": "auto",
-                "fields": ["genre^3"],
+            "query": {
+                "multi_match": {
+                    "query": search_query,
+                    "fuzziness": 1,
+                    "fields": ["genre^3"],
+                }
             }
         }
 

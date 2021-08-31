@@ -42,7 +42,7 @@ class FilmService(BaseService):
             doc = await self.elastic.search(
                 index="movies",
             )
-        return [Film(**film["_source"]) for film in doc]
+        return [Film(**film["_source"]) for film in doc["hits"]["hits"]]
 
 
 @lru_cache()

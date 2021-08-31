@@ -20,7 +20,7 @@ class Film(BaseModel):
     id: str
     title: str
     description: str
-    creation_date: datetime.date
+    creation_date: datetime.datetime
     rating: float
     type: MovieType
     uuid: UUID

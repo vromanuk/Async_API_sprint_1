@@ -38,7 +38,7 @@ class PersonService(BaseService):
             doc = await self.elastic.search(
                 index="people",
             )
-        return [Person(**person["_source"]) for person in doc]
+        return [Person(**person["_source"]) for person in doc["hits"]["hits"]]
 
     async def get_from_elastic_scalar(self, person_id: str) -> Optional[Person]:
         doc = await self.elastic.get("people", person_id)

@@ -47,7 +47,7 @@ async def people_list(
         "size": limit,
         "from": (page - 1) * limit,
         "sort": [f"{sort_value}:{sort_order.value}"],
-        "_source": ["id", "first_name", "last_name"],
+        "_source": ["id", "first_name", "last_name", "birth_date"],
     }
 
     if search_query:
@@ -76,11 +76,4 @@ async def person_details(
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="person not found")
 
-    return Person(
-        id=person.id,
-        first_name=person.first_name,
-        last_name=person.last_name,
-        birth_date=person.birth_date,
-        created=person.created,
-        modified=person.modified,
-    )
+    return person

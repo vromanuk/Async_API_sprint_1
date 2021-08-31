@@ -13,11 +13,16 @@ def cached(decoder, many: bool = False):
     def decorator(func):
         @wraps(func)
         async def decorated_function(*args, **kwargs):
-            cache = await get_redis()
-            cache_key = (
-                f"{kwargs['search_query']}:{kwargs['sort_order'].lower()}:{kwargs['sort'].lower()}:"
-                f"{kwargs['page']}:{kwargs['limit']}"
-            )
+            cache = get_redis()
+            if many:
+                cache_key = (
+                    f"{kwargs['search_query']}:{kwargs['sort_order'].lower()}:{kwargs['sort'].lower()}:"
+                    f"{kwargs['page']}:{kwargs['limit']}"
+                )
+            else:
+                _, entity = kwargs.items()
+                entity_title, _ = entity[0].split("_")
+                cache_key = f"{entity_title}:{entity[1]}"
             rv = await cache.get_from_cache(cache_key)
 
             if rv is not None:
@@ -25,12 +30,12 @@ def cached(decoder, many: bool = False):
                     entities = orjson.loads(rv)
                     if not entities:
                         return []
-                    return [decoder.parse_raw(entity) for entity in rv]
+                    return entities
                 return decoder.parse_raw(rv)
 
             rv = await func(*args, **kwargs)
             if many:
-                await cache.cache(cache_key, orjson.dumps(rv))
+                await cache.cache(cache_key, orjson.dumps([entity.dict() for entity in rv]))
             else:
                 await cache.cache(cache_key, rv.json())
 

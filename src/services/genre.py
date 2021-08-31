@@ -38,7 +38,7 @@ class GenreService(BaseService):
             doc = await self.elastic.search(
                 index="genres",
             )
-        return [Genre(**genre["_source"]) for genre in doc]
+        return [Genre(**genre["_source"]) for genre in doc["hits"]["hits"]]
 
     async def get_from_elastic_scalar(self, genre_id: str) -> Optional[Genre]:
         doc = await self.elastic.get("genres", genre_id)

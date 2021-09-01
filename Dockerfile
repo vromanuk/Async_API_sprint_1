@@ -17,7 +17,7 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
 COPY --chown=tarantino:tarantino ["./src/pyproject.toml", "./src/poetry.lock*", "./"]
 EXPOSE 8000
 
-RUN poetry install --no-root --no-dev
+RUN poetry install --no-root
 
 COPY --chown=tarantino:tarantino ["src/", "./src"]
 USER tarantino

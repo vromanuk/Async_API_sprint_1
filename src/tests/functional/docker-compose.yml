@@ -19,19 +19,33 @@ services:
         hard: -1
     volumes:
       - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+  kib01:
+    image: docker.elastic.co/kibana/kibana:7.14.0
+    container_name: kib01
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://es01:9200
+      ELASTICSEARCH_HOSTS: '["http://es01:9200"]'
 
   web:
-    build: .
+    image: async_api_sprint_1_web
+    build: ../../../
     depends_on:
       - es01
       - redis
 
-  nginx:
-    build: ./src/nginx
-    ports:
-      - "80:80"
+  tests:
+    image: async_api_sprint_1_web
+    command: bash -c "/app/src/tests/functional/utils/wait_to_start.sh && pytest /app/src/tests/functional/src"
     depends_on:
-      - web
+      - es01
+      - redis
+    env_file:
+      - .env-tests
 
 volumes:
   es_data:

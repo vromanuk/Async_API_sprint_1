@@ -12,7 +12,7 @@ class TestSettings(BaseSettings):
     redis_port: int = 6379
 
     class Config:
-        env_file = ".env"
+        env_file = ".env-tests"
 
 
 @lru_cache()

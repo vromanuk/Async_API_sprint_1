@@ -19,13 +19,16 @@ class SortFieldPerson(str, Enum):
     FIRST_NAME = "first_name"
     LAST_NAME = "last_name"
 
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_
+
 
 @router.get(
     "/",
     response_model=list[Person],
     summary="Получение списка участников в произведении",
     response_description="Список участников в произведении",
-    tags=["people_list"],
 )
 @cached(decoder=Person)
 async def people_list(
@@ -43,16 +46,18 @@ async def people_list(
     es_query = {
         "size": limit,
         "from": (page - 1) * limit,
-        "sort": [{sort_value: sort_order.value}],
-        "_source": ["id", "first_name", "last_name"],
+        "sort": [f"{sort_value}:{sort_order.value}"],
+        "_source": ["id", "first_name", "last_name", "birth_date"],
     }
 
     if search_query:
         es_query["query"] = {
-            "multi_match": {
-                "query": search_query,
-                "fuzziness": "auto",
-                "fields": ["first_name^2", "last_name^2"],
+            "query": {
+                "multi_match": {
+                    "query": search_query,
+                    "fuzziness": 1,
+                    "fields": ["first_name^2", "last_name^2"],
+                }
             }
         }
 
@@ -64,7 +69,6 @@ async def people_list(
     response_model=Person,
     summary="Получение информации о конкретной личности",
     response_description="Информация о конкретной личности",
-    tags=["person_details"],
 )
 @cached(decoder=Person)
 async def person_details(
@@ -74,11 +78,4 @@ async def person_details(
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="person not found")
 
-    return Person(
-        id=person.id,
-        first_name=person.first_name,
-        last_name=person.last_name,
-        birth_date=person.birth_date,
-        created=person.created,
-        modified=person.modified,
-    )
+    return person

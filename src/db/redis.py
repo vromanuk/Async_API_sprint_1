@@ -8,5 +8,5 @@ redis: Redis = None
 
 
 @lru_cache()
-async def get_redis() -> RedisCache:
+def get_redis() -> RedisCache:
     return RedisCache(redis)

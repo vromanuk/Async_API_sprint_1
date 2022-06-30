@@ -18,13 +18,16 @@ class SortFieldGenre(str, Enum):
     ID = "id"
     GENRE = "genre"
 
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_
+
 
 @router.get(
     "/",
     response_model=list[Genre],
     summary="Получение списка жанров",
     response_description="Список жанров",
-    tags=["genres_list"],
 )
 @cached(decoder=Genre)
 async def genre_list(
@@ -42,16 +45,18 @@ async def genre_list(
     es_query = {
         "size": limit,
         "from": (page - 1) * limit,
-        "sort": [{sort_value: sort_order.value}],
+        "sort": [f"{sort_value}:{sort_order.value}"],
         "_source": ["id", "genre"],
     }
 
     if search_query:
         es_query["query"] = {
-            "multi_match": {
-                "query": search_query,
-                "fuzziness": "auto",
-                "fields": ["genre^3"],
+            "query": {
+                "multi_match": {
+                    "query": search_query,
+                    "fuzziness": 1,
+                    "fields": ["genre^3"],
+                }
             }
         }
 
@@ -63,7 +68,6 @@ async def genre_list(
     response_model=Genre,
     summary="Получение информации о конкретном жанре",
     response_description="Информация о конкретном жанре",
-    tags=["genre_details"],
 )
 @cached(decoder=Genre)
 async def genre_details(genre_id: str, genre_service: GenreService = Depends(get_genre_service)) -> Genre:  # noqa B008
@@ -71,4 +75,4 @@ async def genre_details(genre_id: str, genre_service: GenreService = Depends(get
     if not genre:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="genre not found")
 
-    return Genre(id=genre.id, genre=genre.genre, created=genre.created, modified=genre.modified)
+    return genre

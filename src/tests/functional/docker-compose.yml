@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=es01
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+  kib01:
+    image: docker.elastic.co/kibana/kibana:7.14.0
+    container_name: kib01
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://es01:9200
+      ELASTICSEARCH_HOSTS: '["http://es01:9200"]'
+
+  web:
+    image: async_api_sprint_1_web
+    build: ../../../
+    depends_on:
+      - es01
+      - redis
+
+  tests:
+    image: async_api_sprint_1_web
+    command: bash -c "/app/src/tests/functional/utils/wait_to_start.sh && pytest /app/src/tests/functional/src"
+    depends_on:
+      - es01
+      - redis
+    env_file:
+      - .env-tests
+
+volumes:
+  es_data:

@@ -1,0 +1,257 @@
+[
+   {
+      "id":1,
+      "title":"Beirut",
+      "description":"In 1980s Beirut, Mason Skiles is a former U.S. diplomat who is called back into service to save a colleague from the gro...",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"tv_show",
+      "uuid":"5e94d72c-a52e-4e7b-a99b-eff77b5291b5",
+      "rating":1,
+      "genres":[
+        {"id": 1,
+          "genre": "drama",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "182d2fb0-1b11-4f22-8707-081b941f40fe",
+          "first_name": "John",
+          "last_name": "Doe",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   },
+   {
+      "id":2,
+      "title":"2046",
+      "description":"Women enter and exit a science fiction author's life, over the course of a few years, after the author loses the woman h...",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"movie",
+      "uuid":"7db8b05d-327d-4b83-be0d-d75e54b2f7ff",
+      "rating":6,
+      "genres":[
+        {"id": 2,
+          "genre": "romance",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        },
+        {"id": 3,
+          "genre": "comedy",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "d904a3e8-b867-41da-ada2-880f6bd85935",
+          "first_name": "Michael",
+          "last_name": "Hall",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   },
+   {
+      "id":3,
+      "title":"From Paris with Love",
+      "description":"James Reese has a good job as an ambassador's aid in France, but his real passion is a side gig—working in a minor rol...",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"tv_show",
+      "uuid":"d7b73798-ff0e-406a-a034-41da6388e3e7",
+      "rating":3,
+      "genres":[
+        {"id": 3,
+          "genre": "comedy",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "fc4eb1db-e220-48a0-94d5-b50abe23a47d",
+          "first_name": "Christopher",
+          "last_name": "Lloyd",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   },
+   {
+      "id":4,
+      "title":"The Client",
+      "description":"A street-wise kid, Mark Sway, sees the suicide of Jerome Clifford, a prominent Louisiana lawyer, whose current client is...",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"tv_show",
+      "uuid":"c3c07d95-334a-4685-b789-f4fad75d74d5",
+      "rating":3,
+      "genres":[
+        {"id": 2,
+          "genre": "romance",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "1c024b42-4e66-483e-b25a-b6f19b989ebd",
+          "first_name": "Chris",
+          "last_name": "Pratt",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   },
+   {
+      "id":5,
+      "title":"King Kong",
+      "description":"In this remake of the 1933 classic, an oil company expedition disturbs the peace of a giant ape and brings him back to N...",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"tv_show",
+      "uuid":"67fddb43-f867-493c-bd03-aa9ee8aed7eb",
+      "rating":9,
+      "genres":[
+        {"id": 4,
+          "genre": "thriller",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "0908aa10-afce-49e8-823b-4e0758780652",
+          "first_name": "Sean",
+          "last_name": "Bean",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   },
+   {
+      "id":6,
+      "title":"Marvin's Room",
+      "description":"A leukemia patient attempts to end a 20-year feud with her sister to get her bone marrow....",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"movie",
+      "uuid":"03cd9306-e0d4-4383-ae53-902f81aa7cda",
+      "rating":5,
+      "genres":[
+        {"id": 4,
+          "genre": "thriller",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "fcd093c3-bd85-4eaa-8762-3a0414ecbf49",
+          "first_name": "Chuck",
+          "last_name": "Norris",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   },
+   {
+      "id":7,
+      "title":"A Quiet Place",
+      "description":"A family is forced to live in silence while hiding from creatures that hunt by sound...",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"movie",
+      "uuid":"b35307e2-a7e1-4696-a532-962fcec03263",
+      "rating":8,
+      "genres":[
+        {"id": 3,
+          "genre": "comedy",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "502f1b8a-0873-4d8c-93a1-4cabf8785812",
+          "first_name": "Owen",
+          "last_name": "Wilson",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   },
+   {
+      "id":8,
+      "title":"The Bucket List",
+      "description":"Corporate billionaire Edward Cole and working class mechanic Carter Chambers are worlds apart. At a crossroads in their ..",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"tv_show",
+      "uuid":"6e6837c4-9c11-4baf-8681-6baa690227a1",
+      "rating":5,
+      "genres":[
+        {"id": 2,
+          "genre": "romance",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "05277e08-568f-4b9a-8cdd-5c4c74c67fb9",
+          "first_name": "Charles",
+          "last_name": "Bronson",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   },
+   {
+      "id":9,
+      "title":"Weathering with You",
+      "description":"Tokyo is currently experiencing rain showers that seem to disrupt the usual pace of everyone living there to no end.",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"tv_show",
+      "uuid":"3277be10-9c11-4368-8aeb-d99050551398",
+      "rating":8,
+      "genres":[
+        {"id": 2,
+          "genre": "romance",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "ca3802b6-cc89-4e07-b319-284cc1d2aaf9",
+          "first_name": "Richard",
+          "last_name": "Grant",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   },
+   {
+      "id":10,
+      "title":"City of God",
+      "description":"Cidade de Deus is a shantytown that started during the 1960s and became one of Rio de Janeiro’s most dangerous places ...",
+      "creation_date":"2021-08-31 06:46:13.442292",
+      "type":"tv_show",
+      "uuid":"15d27bbc-8c33-47fb-8c75-3793b4f85122",
+      "rating":10,
+      "genres":[
+        {"id": 3,
+          "genre": "comedy",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292"
+        }
+      ],
+      "people":[
+        {"id": "af22f981-70fa-4412-9ef3-84f4f32c8fdf",
+          "first_name": "Martin",
+          "last_name": "Lawrence",
+          "created": "2021-08-31 06:46:13.442292",
+          "modified": "2021-08-31 06:46:13.442292",
+          "birth_date": "1998-03-13"
+        }
+      ]
+   }
+]

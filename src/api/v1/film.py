@@ -19,13 +19,16 @@ class SortFieldFilm(str, Enum):
     TITLE = "title"
     IMDB_RATING = "imdb_rating"
 
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_
+
 
 @router.get(
     "/",
     response_model=list[Film],
     summary="Получение списка произведений",
     response_description="Список произведений",
-    tags=["film_list"],
 )
 @cached(decoder=Film, many=True)
 async def film_list(
@@ -43,16 +46,30 @@ async def film_list(
     es_query = {
         "size": limit,
         "from": (page - 1) * limit,
-        "sort": [{sort_value: sort_order.value}],
-        "_source": ["id", "title", "imdb_rating"],
+        "sort": [f"{sort_value}:{sort_order.value}"],
+        "_source": [
+            "id",
+            "title",
+            "rating",
+            "description",
+            "creation_date",
+            "type",
+            "uuid",
+            "genres",
+            "people",
+            "certificate",
+            "file_path",
+        ],
     }
 
     if search_query:
         es_query["query"] = {
-            "multi_match": {
-                "query": search_query,
-                "fuzziness": "auto",
-                "fields": ["title^5", "description^4", "genre^3", "actors_names^3", "writers_names^2", "director"],
+            "query": {
+                "multi_match": {
+                    "query": search_query,
+                    "fuzziness": 1,
+                    "fields": ["title^5", "description^4", "genre^3", "actors_names^3", "writers_names^2", "director"],
+                }
             }
         }
 
@@ -64,7 +81,6 @@ async def film_list(
     response_model=Film,
     summary="Получение информации о конкретном произведении",
     response_description="Информация о конкретном произведении",
-    tags=["film_details"],
 )
 @cached(decoder=Film)
 async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> Film:  # noqa B008
@@ -72,4 +88,4 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="film not found")
 
-    return Film(id=film.id, title=film.title)
+    return film
